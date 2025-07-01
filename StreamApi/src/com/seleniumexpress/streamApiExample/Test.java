@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -286,6 +287,48 @@ public class Test {
 		System.out.println("20.Check if all employees are older than 25 years.");
 		boolean allMatch2 = employeeList.stream().allMatch(emp -> emp.getEmployeeAge() > 25);
 		System.out.println("Check if all employees are older than 25 years." + allMatch2);
+
+		System.out.println(" Find the 4th Highest Salaried Employee");
+
+		Optional<Employee> first = employeeList.stream()
+				.sorted(Comparator.comparing(Employee::getEmployeeSalary).reversed()).skip(3).findFirst();
+
+		if (first.isPresent()) {
+			Employee employee5 = first.get();
+			System.out.println(employee5);
+		}
+
+		System.out.println(" Create a Map of Employee Name → Age");
+
+		employeeList.stream().collect(Collectors.toMap(Employee::getEmployeeName, Employee::getEmployeeAge)).entrySet()
+				.stream().forEach((entry) -> System.out.println(entry.getKey() + " " + entry.getValue()));
+		System.out.println(" List Departments With More Than 3 Employees");
+
+		employeeList.stream().collect(Collectors.groupingBy(Employee::getEmployeeDepartment)).entrySet().stream()
+				.filter(entry -> entry.getValue().size() >= 3).forEach(entry -> System.out.println(entry.getKey()));
+
+		System.out.println("Print Employees Grouped by Gender and Sorted by Salary");
+
+		employeeList.stream().sorted(Comparator.comparing(Employee::getEmployeeSalary))
+				.collect(Collectors.groupingBy(Employee::getEmployeeGender))
+				.forEach((key, value) -> System.out.println(key + " " + value));
+
+		System.out.println("Find Employees Whose Name Starts and Ends With Same Character");
+
+		List<Employee> list4 = employeeList.stream().filter(emp -> emp.getEmployeeName().charAt(0) == emp
+				.getEmployeeName().charAt(emp.getEmployeeName().length() - 1)).toList();
+
+		System.out.println(list4);
+
+		System.out.println("Find the Department With the Highest Average Salary");
+
+		employeeList.stream()
+				.collect(Collectors.groupingBy(Employee::getEmployeeDepartment,
+						Collectors.averagingDouble(Employee::getEmployeeSalary)))
+				.entrySet().stream()
+				.sorted((s1, s2) -> (int) (s1.getValue() - s2.getValue())).findFirst()
+				//sorted(Map.Entry.comparingByValue()).findFirst()
+				.ifPresent(emp -> System.out.println(emp.getKey()));
 
 	}
 
